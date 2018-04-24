@@ -1,4 +1,7 @@
 import java.net.* ;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 
 public class clienteudp
@@ -7,27 +10,29 @@ public class clienteudp
 
    public static void main( String args[] )
    {
-      // Check the arguments
-      if( args.length != 2 )
-      {
-         System.out.println( "Sintaxis: java #nombrearchivo host port" ) ;
-         return ;
-      }
 
       DatagramSocket socket = null ;
 
       try
       {
          // Convert the arguments first, to ensure that they are valid
-         InetAddress host = InetAddress.getByName( args[0] ) ;
-         int port= Integer.parseInt( args[1] ) ;
+         InetAddress host = InetAddress.getByName("127.0.0.1");
+         int port= 8888;
 
          // Construct the socket
          socket = new DatagramSocket() ;
+         System.out.println("Enter username: ");
+             BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
+             String username = bufferRead.readLine();
 
-         // Construct the datagram packet
-         String s =  "{\"id\":  \"new_id\", \"user\": \"new_user\",\"text\": \"new_text\",\"time\": \"new_time\"}";
-         byte [] data = s.getBytes() ;
+             System.out.println(username);
+
+            //despues de que ingreso el nombre de usuario se le pregunta que accion quiere realizar
+            //Poner un case, para  formar el string dependiendo, los campos que no se utilicen como texto, envias vacios
+
+             // Construct the datagram packet
+         String s_json =  "{\"id\":  \"new_id\", \"user\": \"new_user\",\"text\": \"new_text\",\"action\": \"new_action\"}";
+         byte [] data = s_json.getBytes() ;
          DatagramPacket packet = new DatagramPacket( data, data.length, host, port ) ;
 
          // Send it

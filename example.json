@@ -1,13 +1,15 @@
 {"messages":
 [
     {
-    "user": "Ryan Smith",
+    "id": "1",
+    "user": "user1",
     "text": "this is an example",
-    "time": "04:41"
+    "action": "a"
     },
     {
-    "user": "Second user",
-    "text": "Second example",
-    "time": "04:412"
+    "id": "1",
+    "user": "user1",
+    "text": "this is an example",
+    "action": "a"
     }
- , {"text": "new_text", "time": "new_time", "id": "new_id", "user": "new_user"} , {"text": "new_text", "time": "new_time", "id": "new_id", "user": "new_user"}]}
+ , {"action": "new_action", "text": "new_text", "id": "new_id", "user": "new_user"}]}

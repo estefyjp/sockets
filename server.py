@@ -4,10 +4,9 @@ import json
 
 
 def processEntry(data):
-    print(data)
     d = data.replace('\\', ' ')
     d_json = json.loads(d)
-    print(d_json)
+    solve_action(d_json)
     with open('example.json', 'a+') as f:
         f.seek(0, 2)
         f.truncate()
@@ -18,17 +17,44 @@ def processEntry(data):
         f.write(']}')
 
 
+def give_users():
+    data = json.load(open('example.json'))
+    for d in data['messages']:
+        print(d['user'])
+
+
+def broadcast_message():
+    print
+
+def private_message():
+    print
+
+def exit():
+    print
+    
+
+def solve_action(d_json):
+    action = d_json['action']
+    print(action)
+    if action == 'a':
+        broadcast_message()
+    elif action == 'b':
+        give_users()
+    elif action == 'c':
+        private_message()
+    elif action == 'd':
+        exit()
 
 
 HOST = ''   # Symbolic name meaning all available interfaces
 PORT = 8888 # Arbitrary non-privileged port
 
 # Datagram (udp) socket
-try :
+try:
 
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     print 'Socket created'
-except socket.error, msg :
+except socket.error, msg:
     print 'Failed to create socket. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
     sys.exit()
 
@@ -36,7 +62,7 @@ except socket.error, msg :
 # Bind socket to local host and port
 try:
     s.bind((HOST, PORT))
-except socket.error , msg:
+except socket.error, msg:
     print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
     sys.exit()
 
@@ -55,7 +81,7 @@ while 1:
     reply = 'OK...' + data
     processEntry(data)
 
-    s.sendto(reply , addr)
+    s.sendto(reply, addr)
     print 'Message[' + addr[0] + ':' + str(addr[1]) + '] - ' + data.strip()
 
 s.close()
