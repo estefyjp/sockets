@@ -10,6 +10,4 @@
     "text": "Second example",
     "time": "04:412"
     }
-]
-}
-{"text": "new_text", "time": "new_time", "id": "new_id", "user": "new_user"}
+ , {"text": "new_text", "time": "new_time", "id": "new_id", "user": "new_user"} , {"text": "new_text", "time": "new_time", "id": "new_id", "user": "new_user"}]}

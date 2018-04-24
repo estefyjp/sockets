@@ -4,13 +4,19 @@ import json
 
 
 def processEntry(data):
-    data = data.replace('\\', ' ') #formatiing string with json
-    #data = data[1:]
-    d = json.loads(data) #converts string to json
+    print(data)
+    d = data.replace('\\', ' ')
+    d_json = json.loads(d)
+    print(d_json)
+    with open('example.json', 'a+') as f:
+        f.seek(0, 2)
+        f.truncate()
+        f.seek(-2, 2)
+        f.truncate()
+        f.write(' , ')
+        json.dump(d_json, f)
+        f.write(']}')
 
-    file = open('example.json', 'a+')
-    file.write(json.dumps(d))
-    print(d['id'])
 
 
 
