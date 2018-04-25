@@ -27,29 +27,32 @@ public class clienteudp
 
              System.out.println(username);
 
+        while(true){
+
             //despues de que ingreso el nombre de usuario se le pregunta que accion quiere realizar
             //Poner un case, para  formar el string dependiendo, los campos que no se utilicen como texto, envias vacios
 
              // Construct the datagram packet
-         String s_json =  "{\"id\":  \"new_id\", \"user\": \"new_user\",\"text\": \"new_text\",\"action\": \"new_action\"}";
-         byte [] data = s_json.getBytes() ;
-         DatagramPacket packet = new DatagramPacket( data, data.length, host, port ) ;
 
-         // Send it
-         socket.send( packet ) ;
+             String s_json =  "{\"id\":  \"new_id\", \"user\": \"new_user\",\"text\": \"new_text\",\"action\": \"a\"}";
+             byte [] data = s_json.getBytes() ;
+             DatagramPacket packet = new DatagramPacket( data, data.length, host, port ) ;
 
-         // Set a receive timeout, 2000 milliseconds
-         socket.setSoTimeout( 2000 ) ;
+             // Send it
+             socket.send( packet ) ;
 
-         // Prepare the packet for receive
-         packet.setData( new byte[PACKETSIZE] ) ;
+             // Set a receive timeout, 2000 milliseconds
+             socket.setSoTimeout( 2000 ) ;
 
-         // Wait for a response from the server
-         socket.receive( packet ) ;
+             // Prepare the packet for receive
+             packet.setData( new byte[PACKETSIZE] ) ;
 
-         // Print the response
-         System.out.println( new String(packet.getData()) ) ;
+             // Wait for a response from the server
+             socket.receive( packet ) ;
 
+             // Print the response
+             System.out.println( new String(packet.getData()) ) ;
+        }
       }
       catch( Exception e )
       {

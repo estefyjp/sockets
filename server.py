@@ -3,9 +3,11 @@ import sys
 import json
 
 
-def processEntry(data):
+def processEntry(data, addr):
     d = data.replace('\\', ' ')
     d_json = json.loads(d)
+    d_json['id'] = addr[0]
+    print(d_json)
     solve_action(d_json)
     with open('example.json', 'a+') as f:
         f.seek(0, 2)
@@ -18,32 +20,44 @@ def processEntry(data):
 
 
 def give_users():
+    print("*GIVE USERS")
+    user_array = []
     data = json.load(open('example.json'))
     for d in data['messages']:
-        print(d['user'])
+        user_array = d['user']
+        print("user_array", user_array)
+    #s.sendto(user_array, d['id'])
 
 
-def broadcast_message():
-    print
+def broadcast_message(d_json):
+    print("*BROADCAST MESSAGE")
+    data = json.load(open('example.json'))
+    for d in data['messages']:
+        print("send to", d_json['text'], d['id'])
+        #s.sendto(d_json['text'], d['user'])
 
-def private_message():
-    print
 
-def exit():
-    print
-    
+def private_message(d_json):
+    print("*PRIVATE MESSAGE")
+    s.sendto(d_json['text'], d_json['id'])
+
+
+def exit(d_json):
+    print("*EXIT")
+    s.sendto("exit", d_json['id'])
+
 
 def solve_action(d_json):
     action = d_json['action']
     print(action)
     if action == 'a':
-        broadcast_message()
+        broadcast_message(d_json)
     elif action == 'b':
         give_users()
     elif action == 'c':
-        private_message()
+        private_message(d_json)
     elif action == 'd':
-        exit()
+        exit(d_json)
 
 
 HOST = ''   # Symbolic name meaning all available interfaces
@@ -79,7 +93,7 @@ while 1:
         break
 
     reply = 'OK...' + data
-    processEntry(data)
+    #processEntry(data, addr)
 
     s.sendto(reply, addr)
     print 'Message[' + addr[0] + ':' + str(addr[1]) + '] - ' + data.strip()

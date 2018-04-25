@@ -12,4 +12,4 @@
     "text": "this is an example",
     "action": "a"
     }
- , {"action": "new_action", "text": "new_text", "id": "new_id", "user": "new_user"}]}
+ , {"action": "new_action", "text": "new_text", "id": "new_id", "user": "new_user"} , {"action": "new_action", "text": "new_text", "id": "new_id", "user": "new_user"} , {"action": "new_action", "text": "new_text", "id": ["127.0.0.1", 62169], "user": "new_user"} , {"action": "new_action", "text": "new_text", "id": "127.0.0.1", "user": "new_user"} , {"action": "a", "text": "new_text", "id": "127.0.0.1", "user": "new_user"}]}
