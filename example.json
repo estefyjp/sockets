@@ -1,15 +1,8 @@
 {"messages":
 [
     {
-    "id": "1",
-    "user": "user1",
+    "id": "0",
+    "user": "user_example",
     "text": "this is an example",
     "action": "a"
-    },
-    {
-    "id": "1",
-    "user": "user1",
-    "text": "this is an example",
-    "action": "a"
-    }
- , {"action": "new_action", "text": "new_text", "id": "new_id", "user": "new_user"} , {"action": "new_action", "text": "new_text", "id": "new_id", "user": "new_user"} , {"action": "a", "text": "new_text", "id": "127.0.0.1", "user": "lily"} , {"action": "a", "text": "hola", "id": "127.0.0.1", "user": "estfey"} , {"action": "a", "text": "ola", "id": "127.0.0.1", "user": "estfey"}]}
+    } , {"action": "e", "text": "", "id": ["127.0.0.1", 58860], "user": "estefy"} , {"action": "e", "text": "", "id": ["127.0.0.1", 63884], "user": "lily"} , {"action": "c", "text": "hola,lily", "id": ["127.0.0.1", 58860], "user": "estefy"}]}

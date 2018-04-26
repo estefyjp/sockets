@@ -19,17 +19,34 @@ public class clienteudp
          // Convert the arguments first, to ensure that they are valid
          InetAddress host = InetAddress.getByName("127.0.0.1");
          int port= 8888;
-
+         String s_json;
+         DatagramPacket packet;
+         byte [] data;
          // Construct the socket
          socket = new DatagramSocket() ;
          System.out.println("Enter username: ");
              BufferedReader bufferRead = new BufferedReader(new InputStreamReader(System.in));
              String username = bufferRead.readLine();
+             s_json =  "{\"id\":  \"\", \"user\": \""+username+"\",\"text\": \"\",\"action\": \"e\"}";
+             data = s_json.getBytes() ;
+             packet = new DatagramPacket( data, data.length, host, port ) ;
+                     // Send it
+             socket.send( packet ) ;
+             //necesita poder recibir en caso de que el nombre de usuario este repetido
+             // Set a receive timeout, 2000 milliseconds
+ 			socket.setSoTimeout( 5000 ) ;
+ 			// Prepare the packet for receive
+ 			packet.setData( new byte[PACKETSIZE] ) ;
+ 			// Wait for a response from the server
+ 			socket.receive( packet ) ;
+ 			// Print the response
+ 			System.out.println( new String(packet.getData()) ) ;
 
-             System.out.println(username);
+        //TODO Agregar validacion en caso de que se ingrese un nombre de usuarioya existente y se tenga que pedir nuevamente
+
 
         //while(true){
-	    String option, m;
+	    String option, m, recipient;
 	    int id=0;
 	    Scanner scanner= new Scanner(System.in);
 	    System.out.println("--Welcome, select an option (type the letter)--");
@@ -44,9 +61,9 @@ public class clienteudp
 			System.out.println("Type the message: ");
 			System.out.print(">>");
 			m= scanner.nextLine();
-			String s_json =  "{\"id\":  \""+id+"\", \"user\": \""+username+"\",\"text\": \""+m+"\",\"action\": \"a\"}";
-			byte [] data = s_json.getBytes() ;
-             		DatagramPacket packet = new DatagramPacket( data, data.length, host, port ) ;
+			s_json =  "{\"id\":  \""+id+"\", \"user\": \""+username+"\",\"text\": \""+m+"\",\"action\": \"a\"}";
+			data = s_json.getBytes() ;
+            packet = new DatagramPacket( data, data.length, host, port ) ;
               		// Send it
 			socket.send( packet ) ;
 			// Set a receive timeout, 2000 milliseconds
@@ -61,6 +78,26 @@ public class clienteudp
 		case "b":
 		break;
 		case "c":
+            System.out.println("Type the message: ");
+            System.out.print(">>");
+            m= scanner.nextLine();
+            System.out.println("Type the recipient: ");
+            System.out.print(">>");
+            recipient= scanner.nextLine();
+            m = m + "," + recipient;
+            s_json =  "{\"id\":  \""+id+"\", \"user\": \""+username+"\",\"text\": \""+m+"\",\"action\": \"c\"}";
+            data = s_json.getBytes() ;
+            packet = new DatagramPacket( data, data.length, host, port ) ;
+                    // Send it
+            socket.send( packet ) ;
+            // Set a receive timeout, 2000 milliseconds
+            socket.setSoTimeout( 2000 ) ;
+            // Prepare the packet for receive
+            packet.setData( new byte[PACKETSIZE] ) ;
+            // Wait for a response from the server
+            socket.receive( packet ) ;
+            // Print the response
+            System.out.println( new String(packet.getData()) ) ;
 		break;
 		case "d":
 		break;
