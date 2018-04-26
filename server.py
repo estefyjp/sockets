@@ -1,6 +1,7 @@
 import socket
 import sys
 import json
+import threading
 
 
 def processEntry(data, addr):
@@ -8,7 +9,7 @@ def processEntry(data, addr):
     d_json = json.loads(d)
     d_json['id'] = addr[0]
     print(d_json)
-    solve_action(d_json)
+    #solve_action(d_json)
     with open('example.json', 'a+') as f:
         f.seek(0, 2)
         f.truncate()
@@ -65,13 +66,11 @@ PORT = 8888 # Arbitrary non-privileged port
 
 # Datagram (udp) socket
 try:
-
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     print 'Socket created'
 except socket.error, msg:
     print 'Failed to create socket. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
     sys.exit()
-
 
 # Bind socket to local host and port
 try:
@@ -93,7 +92,7 @@ while 1:
         break
 
     reply = 'OK...' + data
-    #processEntry(data, addr)
+    processEntry(data, addr)
 
     s.sendto(reply, addr)
     print 'Message[' + addr[0] + ':' + str(addr[1]) + '] - ' + data.strip()
