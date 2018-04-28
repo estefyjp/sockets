@@ -3,7 +3,6 @@ import sys
 import json
 import threading
 
-
 def processEntry(data, addr):
     user_exists = 0
     user_ok = 0
@@ -64,6 +63,8 @@ def broadcast_message(d_json):
 
 
 def private_message(d_json):
+    user_exists = 0
+    user_ok = 0
     error_mssg = "User doesn't exist"
     text = d_json['text']
     array_text = text.split(',')
@@ -72,11 +73,14 @@ def private_message(d_json):
     data = json.load(open('example.json'))
     for d in data['messages']:
         if recipient_pm == d['user']:
-            print("Private message sent: ", private_message, tuple(d['id']))
-            s.sendto(private_message, tuple(d['id']))
+            user_exists = 1
         else:
-            s.sendto(error_mssg, d_json['id'])
-
+            user_ok = 1
+    if user_exists == 1:
+        print("Private message sent: ", private_message, tuple(d['id']))
+        s.sendto(private_message, tuple(d['id']))
+    elif user_ok == 1:
+        s.sendto(error_mssg, d_json['id'])
 
 def exit(d_json):
     print("*EXIT")
@@ -97,39 +101,49 @@ def solve_action(d_json):
     elif action == 'e':
         print("new user saved")
 
-HOST = ''   # Symbolic name meaning all available interfaces
-PORT = 8888 # Arbitrary non-privileged port
 
 # Datagram (udp) socket
-try:
-    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    print 'Socket created'
-except socket.error, msg:
-    print 'Failed to create socket. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
-    sys.exit()
+def server_thread():
+    HOST = '0.0.0.0'  # Symbolic name meaning all available interfaces
+    PORT = 8888  # Arbitrary non-privileged port
 
-# Bind socket to local host and port
-try:
-    s.bind((HOST, PORT))
-except socket.error, msg:
-    print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
-    sys.exit()
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        print 'Socket created'
+    except socket.error, msg:
+        print 'Failed to create socket. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
+        sys.exit()
 
-print 'Socket bind complete'
+    # Bind socket to local host and port
+    try:
+        s.bind((HOST, PORT))
+    except socket.error, msg:
+        print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
+        sys.exit()
 
-#now keep talking with the client
-while 1:
-    # receive data from client (data, addr)
-    d = s.recvfrom(1024)
-    data = d[0]
-    addr = d[1]
+    print 'Socket bind complete'
 
-    if not data:
-        break
+    #  now keep talking with the client
+    while 1:
+        # receive data from client (data, addr)
+        d = s.recvfrom(1024)
+        data = d[0]
+        addr = d[1]
 
-    reply = 'OK...' + data
-    processEntry(data, addr)
-    s.sendto(reply, addr)
-    print 'Message[' + addr[0] + ':' + str(addr[1]) + '] - ' + data.strip()
+        if not data:
+            break
 
-s.close()
+        reply = 'OK...' + data
+        processEntry(data, addr)
+        s.sendto(reply, addr)
+        print 'Message[' + addr[0] + ':' + str(addr[1]) + '] - ' + data.strip()
+
+    s.close()
+
+
+threads = list()
+for i in range(3):
+    t = threading.Thread(target=server_thread)
+    threads.append(t)
+    t.start()
+
