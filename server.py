@@ -104,33 +104,19 @@ def solve_action(d_json):
 
 # Datagram (udp) socket
 def server_thread():
-    HOST = '0.0.0.0'  # Symbolic name meaning all available interfaces
-    PORT = 8888  # Arbitrary non-privileged port
-
-    try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        print 'Socket created'
-    except socket.error, msg:
-        print 'Failed to create socket. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
-        sys.exit()
-
-    # Bind socket to local host and port
-    try:
-        s.bind((HOST, PORT))
-    except socket.error, msg:
-        print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
-        sys.exit()
-
-    print 'Socket bind complete'
+    # HOST = ' '  # Symbolic name meaning all available interfaces
+    # PORT = 8888  # Arbitrary non-privileged port
 
     #  now keep talking with the client
     while 1:
+        print("i'm talkin to client")
         # receive data from client (data, addr)
         d = s.recvfrom(1024)
         data = d[0]
         addr = d[1]
-
+        print(d[0])
         if not data:
+            print("no data")
             break
 
         reply = 'OK...' + data
@@ -141,9 +127,29 @@ def server_thread():
     s.close()
 
 
+HOST = '127.0.0.1'  # Symbolic name meaning all available interfaces
+PORT = 8888  # Arbitrary non-privileged port
+
+try:
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    print 'Socket created'
+except socket.error, msg:
+    print 'Failed to create socket. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
+    sys.exit()
+
+# Bind socket to local host and port
+try:
+    s.bind((HOST, PORT))
+except socket.error, msg:
+    print 'Bind failed. Error Code : ' + str(msg[0]) + ' Message ' + msg[1]
+    sys.exit()
+
+print 'Socket bind complete'
+
 threads = list()
 for i in range(3):
     t = threading.Thread(target=server_thread)
+    # t.daemon = True
     threads.append(t)
     t.start()
 

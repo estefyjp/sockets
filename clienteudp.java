@@ -66,21 +66,21 @@ public class Clienteudp extends Thread
    {
 
        // Check the arguments
-       if( args.length != 2 )
+       /*if( args.length != 2 )
        {
           System.out.println( "Sintaxis: java #nombrearchivo host port" ) ;
           return ;
-       }
+      }*/
 
       DatagramSocket socket = null ;
       try
       {
          // Convert the arguments first, to ensure that they are valid
-         //InetAddress host = InetAddress.getByName("127.0.0.1");
-        // int port= 8888;
-        InetAddress host = InetAddress.getByName( args[0] ) ;
+        InetAddress host = InetAddress.getByName("127.0.0.1");
+        int port= 8888;
+        //InetAddress host = InetAddress.getByName( args[0] ) ;
         setHost(host);
-        int port= Integer.parseInt( args[1] ) ;
+        //int port= Integer.parseInt( args[1] ) ;
         setPort(port);
          String s_json;
          DatagramPacket packet;
@@ -94,12 +94,15 @@ public class Clienteudp extends Thread
              setUsername(username);
              s_json =  "{\"id\":  \"\", \"user\": \""+username+"\",\"text\": \"\",\"action\": \"e\"}";
              data = s_json.getBytes() ;
+             System.out.println("*host" +  host);
              packet = new DatagramPacket( data, data.length, host, port ) ;
                      // Send it
              socket.send( packet ) ;
+             System.out.println("paso send");
+
              //necesita poder recibir en caso de que el nombre de usuario este repetido
              // Set a receive timeout, 2000 milliseconds
- 			socket.setSoTimeout( 5000 ) ;
+ 			socket.setSoTimeout( 10000 ) ;
  			// Prepare the packet for receive
  			packet.setData( new byte[PACKETSIZE] ) ;
  			// Wait for a response from the server
