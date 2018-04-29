@@ -6,6 +6,7 @@ import unicodedata
 
 p_mssg = " "
 tup1 = ()
+max_count = 0
 
 
 def processEntry(data, addr):
@@ -114,15 +115,20 @@ def private_message(d_json):
 def resend_message(d_json):
     print("mssg", p_mssg, "addr", tup1)
     if p_mssg != " ":
-        print("entro")
-        global tup1
-        li = list(tup1)
-        li[1] = d_json['id'][1]
-        tup1 = tuple(li)
-        print("mssg", p_mssg, "addr", tup1)
-        s.sendto(p_mssg, tup1)
-        # global p_mssg
-        # p_mssg = " "
+        if max_count < 2:
+            print("entro")
+            global tup1
+            li = list(tup1)
+            li[1] = d_json['id'][1]
+            tup1 = tuple(li)
+            message_for_client = p_mssg
+            print("mssg", message_for_client, "addr", tup1)
+            global max_count
+            max_count += 1
+            s.sendto(message_for_client, tup1)
+        else:
+            global p_mssg
+            p_mssg = " "
 
 
 def exit(d_json):
@@ -144,6 +150,10 @@ def solve_action(d_json):
     elif action == 'e':
         print("new user saved")
     elif action == 'f':
+        if p_mssg == " ":
+            print("cambio de count")
+            global max_count
+            max_count = 0
         resend_message(d_json)
 
 
@@ -155,7 +165,7 @@ def server_thread():
 
     #  now keep talking with the client
     while 1:
-        print("i'm talkin to client")
+        # print("i'm talkin to client")
         # receive data from client (data, addr)
         d = s.recvfrom(1024)
         data = d[0]
@@ -167,7 +177,6 @@ def server_thread():
 
         reply = 'OK...' + data
         processEntry(data, addr)
-        print("*mssg", p_mssg, "*addr", tup1)
         # s.sendto(reply, addr)
         # print 'Message[' + addr[0] + ':' + str(addr[1]) + '] - ' + data.strip()
 
