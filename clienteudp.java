@@ -245,13 +245,13 @@ public class Clienteudp extends Thread
 
            try
            {
-               //System.out.println("i'm reading...");
                // Convert the arguments first, to ensure that they are valid
                String s_json;
                DatagramPacket packet;
                byte [] data;
                InetAddress host =  getHost();
                int port = getPort();
+               System.out.println("i'm reading...from:" + host + "port:" + port);
                s_json =  "{\"id\":  \"id\", \"user\": \"equis\",\"text\": \"ejemplo\",\"action\": \"f\"}";
                data = s_json.getBytes() ;
                // Construct the socket

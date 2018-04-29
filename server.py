@@ -4,6 +4,10 @@ import json
 import threading
 import unicodedata
 
+p_mssg = " "
+tup1 = ()
+
+
 def processEntry(data, addr):
     user_exists = 0
     user_ok = 0
@@ -42,6 +46,8 @@ def processEntry(data, addr):
             json.dump(d_json, f)
             f.write(']}')
         solve_action(d_json)
+    elif d_json['action'] == 'f':
+        solve_action(d_json)
 
 
 def give_users(d_json):  # gives list of users connected to the chat
@@ -69,26 +75,55 @@ def private_message(d_json):
     error_mssg = "User doesn't exist"
     text = d_json['text']
     array_text = text.split(',')
-    private_message = array_text[0]
+    global p_mssg
+    p_mssg = array_text[0]
     recipient_pm = array_text[1]
     data = json.load(open('example.json'))
     for d in data['messages']:
         count += 1
         if recipient_pm == d['user']:
-            tup = d['id']
-            modify_ip = tup[0]
+            list1 = [0, 0]
+            list1[0] = d['id'][0]
+            list1[1] = d_json['id'][1]
+            modify_ip = list1[0]
             modify_ip = modify_ip.encode("utf-8")
-            private_message = private_message.encode("utf-8")
-            tup[0] = modify_ip
-            # print("Private message sent: ", private_message, tuple(d['id']))
-            # print("Private message sent: ", private_message, tuple(tup))
-            print("Private message sent: ", private_message, d_json['id'])
-            s.sendto(private_message, tuple(tup))
+            p_mssg = p_mssg.encode("utf-8")
+            list1[0] = modify_ip
+            global tup1
+            tup1 = tuple(list1)
+            # print("d_json_0", type(d_json['id'][0]))
+            # print("tuple_0", type(list1[0]))
+            # print("d_json_1", type(d_json['id'][1]))
+            # print("tuple_1", type(list1[1]))
+            # print("d_json", type(d_json['id']))
+            # print("tuple", type(tup1))
+
+            # print("Private message sent: ", p_mssg, tuple(d['id']))
+            # print("Private message sent: ", p_mssg, tuple(tup))
+            # print("Private message sent: ", p_mssg, d_json['id'])
+            print("Private message sent: ", p_mssg, tup1)
+
+            # s.sendto(p_mssg, tup1)
         else:
             user_ok += 1
     if user_ok == count:
         print("error")
         s.sendto(error_mssg, d_json['id'])
+
+
+def resend_message(d_json):
+    print("mssg", p_mssg, "addr", tup1)
+    if p_mssg != " ":
+        print("entro")
+        global tup1
+        li = list(tup1)
+        li[1] = d_json['id'][1]
+        tup1 = tuple(li)
+        print("mssg", p_mssg, "addr", tup1)
+        s.sendto(p_mssg, tup1)
+        # global p_mssg
+        # p_mssg = " "
+
 
 def exit(d_json):
     print("*EXIT")
@@ -109,7 +144,7 @@ def solve_action(d_json):
     elif action == 'e':
         print("new user saved")
     elif action == 'f':
-        print("reading")
+        resend_message(d_json)
 
 
 
@@ -132,6 +167,7 @@ def server_thread():
 
         reply = 'OK...' + data
         processEntry(data, addr)
+        print("*mssg", p_mssg, "*addr", tup1)
         # s.sendto(reply, addr)
         # print 'Message[' + addr[0] + ':' + str(addr[1]) + '] - ' + data.strip()
 
