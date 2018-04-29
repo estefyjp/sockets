@@ -71,12 +71,12 @@ public class Clienteudp extends Thread
           System.out.println( "Sintaxis: java #nombrearchivo host port" ) ;
           return ;
       }*/
-
       DatagramSocket socket = null ;
       try
       {
+        //the host and port must be of the server,
          // Convert the arguments first, to ensure that they are valid
-        InetAddress host = InetAddress.getByName("127.0.0.1");
+        InetAddress host = InetAddress.getByName("192.168.1.68");
         int port= 8888;
         //InetAddress host = InetAddress.getByName( args[0] ) ;
         setHost(host);
@@ -94,13 +94,9 @@ public class Clienteudp extends Thread
              setUsername(username);
              s_json =  "{\"id\":  \"\", \"user\": \""+username+"\",\"text\": \"\",\"action\": \"e\"}";
              data = s_json.getBytes() ;
-             System.out.println("*host" +  host);
              packet = new DatagramPacket( data, data.length, host, port ) ;
-                     // Send it
+            // Send it
              socket.send( packet ) ;
-             System.out.println("paso send");
-
-             //necesita poder recibir en caso de que el nombre de usuario este repetido
              // Set a receive timeout, 2000 milliseconds
  			socket.setSoTimeout( 10000 ) ;
  			// Prepare the packet for receive
@@ -114,16 +110,6 @@ public class Clienteudp extends Thread
 
         thread1.start();
         thread2.start();
-
-
-            //despues de que ingreso el nombre de usuario se le pregunta que accion quiere realizar
-            //Poner un case, para  formar el string dependiendo, los campos que no se utilicen como texto, envias vacios
-
-             // Construct the datagram packet
-
-             //String s_json =  "{\"id\":  \"new_id\", \"user\": \"new_user\",\"text\": \"new_text\",\"action\": \"a\"}";
-
-        //}
       }
       catch( Exception e )
       {
@@ -139,124 +125,163 @@ public class Clienteudp extends Thread
    public static void client_operations(){
 
        DatagramSocket socket = null ;
+       while(true){
+           try
+           {
+               String s_json;
+               DatagramPacket packet;
+               byte [] data;
+               InetAddress host =  getHost();
+               int port = getPort();
+               // Construct the socket
+               socket = new DatagramSocket() ;
 
-       try
-       {
-           String s_json;
-           DatagramPacket packet;
-           byte [] data;
-           InetAddress host =  getHost();
-           int port = getPort();
-           // Construct the socket
-           socket = new DatagramSocket() ;
+               //while(true){
+               String option, m, recipient, username;
+               int id=0;
+               username = getUsername();
+               Scanner scanner= new Scanner(System.in);
+               System.out.println("--Select an option--");
+               System.out.println("a) Send message to all users");
+               System.out.println("b) Show online users");
+               System.out.println("c) Send private message");
+               System.out.println("d) Exit");
+               System.out.print(">>");
+               option= scanner.nextLine();
+               switch(option){
+               case "a":
+                   System.out.println("Type the message: ");
+                   System.out.print(">>");
+                   m= scanner.nextLine();
+                   s_json =  "{\"id\":  \""+id+"\", \"user\": \""+username+"\",\"text\": \""+m+"\",\"action\": \"a\"}";
+                   data = s_json.getBytes() ;
+                   packet = new DatagramPacket( data, data.length, host, port ) ;
+                           // Send it
+                   socket.send( packet ) ;
+                   // Set a receive timeout, 2000 milliseconds
+                   socket.setSoTimeout( 10000 ) ;
+                   // Prepare the packet for receive
+                   packet.setData( new byte[PACKETSIZE] ) ;
+                   // Wait for a response from the server
+                   socket.receive( packet ) ;
+                   // Print the response
+                   System.out.println( new String(packet.getData()) ) ;
+               break;
+               case "b":
+                   System.out.println("Users online:");
+                   s_json =  "{\"id\":  \""+id+"\", \"user\": \""+username+"\",\"text\": \"text\",\"action\": \"b\"}";
+                   data = s_json.getBytes() ;
+                   packet = new DatagramPacket( data, data.length, host, port ) ;
+                           // Send it
+                   socket.send( packet ) ;
+                   // Set a receive timeout, 2000 milliseconds
+                   socket.setSoTimeout( 10000 ) ;
+                   // Prepare the packet for receive
+                   packet.setData( new byte[PACKETSIZE] ) ;
+                   // Wait for a response from the server
+                   socket.receive( packet ) ;
+                   // Print the response
+                   System.out.println( new String(packet.getData()) ) ;
+               break;
+               case "c":
+                   System.out.println("Type the message: ");
+                   System.out.print(">>");
+                   m= scanner.nextLine();
+                   System.out.println("Type the recipient: ");
+                   System.out.print(">>");
+                   recipient= scanner.nextLine();
+                   m = m + "," + recipient;
+                   s_json =  "{\"id\":  \""+id+"\", \"user\": \""+username+"\",\"text\": \""+m+"\",\"action\": \"c\"}";
+                   data = s_json.getBytes() ;
+                   packet = new DatagramPacket( data, data.length, host, port);
+                           // Send it
+                   socket.send( packet ) ;
+                   // Set a receive timeout, 2000 milliseconds
+                   socket.setSoTimeout( 10000 ) ;
+                   // Prepare the packet for receive
+                   packet.setData( new byte[PACKETSIZE] ) ;
+                   // Wait for a response from the server
+                   socket.receive( packet ) ;
+                   // Print the response
+                   System.out.println( new String(packet.getData()) ) ;
+               break;
+               case "d":
+                   System.out.println("Exit...");
+        	       s_json =  "{\"id\":  \""+id+"\", \"user\": \""+username+"\",\"text\": \"Exit\",\"action\": \"d\"}";
+                   data = s_json.getBytes() ;
+                   packet = new DatagramPacket( data, data.length, host, port);
+                           // Send it
+                   socket.send( packet ) ;
+                   // Set a receive timeout, 2000 milliseconds
+                   socket.setSoTimeout( 10000 ) ;
+                   // Prepare the packet for receive
+                   packet.setData( new byte[PACKETSIZE] ) ;
+                   // Wait for a response from the server
+                   socket.receive( packet ) ;
+                   // Print the response
+                   System.out.println( new String(packet.getData()) ) ;
+               break;
+               default: System.out.println("Select the correct option");
+               break;
 
-           //while(true){
-           String option, m, recipient, username;
-           int id=0;
-           username = getUsername();
-           Scanner scanner= new Scanner(System.in);
-           System.out.println("--Welcome, select an option (type the letter)--");
-           System.out.println("a) Send message to all users");
-           System.out.println("b) Show online users");
-           System.out.println("c) Send private message");
-           System.out.println("d) Exit");
-           System.out.print(">>");
-           option= scanner.nextLine();
-           switch(option){
-           case "a":
-               System.out.println("Type the message: ");
-               System.out.print(">>");
-               m= scanner.nextLine();
-               s_json =  "{\"id\":  \""+id+"\", \"user\": \""+username+"\",\"text\": \""+m+"\",\"action\": \"a\"}";
-               data = s_json.getBytes() ;
-               packet = new DatagramPacket( data, data.length, host, port ) ;
-                       // Send it
-               socket.send( packet ) ;
-               // Set a receive timeout, 2000 milliseconds
-               socket.setSoTimeout( 2000 ) ;
-               // Prepare the packet for receive
-               packet.setData( new byte[PACKETSIZE] ) ;
-               // Wait for a response from the server
-               socket.receive( packet ) ;
-               // Print the response
-               System.out.println( new String(packet.getData()) ) ;
-           break;
-           case "b":
-           break;
-           case "c":
-               System.out.println("Type the message: ");
-               System.out.print(">>");
-               m= scanner.nextLine();
-               System.out.println("Type the recipient: ");
-               System.out.print(">>");
-               recipient= scanner.nextLine();
-               m = m + "," + recipient;
-               s_json =  "{\"id\":  \""+id+"\", \"user\": \""+username+"\",\"text\": \""+m+"\",\"action\": \"c\"}";
-               data = s_json.getBytes() ;
-               packet = new DatagramPacket( data, data.length, host, port);
-                       // Send it
-               socket.send( packet ) ;
-               // Set a receive timeout, 2000 milliseconds
-               socket.setSoTimeout( 2000 ) ;
-               // Prepare the packet for receive
-               packet.setData( new byte[PACKETSIZE] ) ;
-               // Wait for a response from the server
-               socket.receive( packet ) ;
-               // Print the response
-               System.out.println( new String(packet.getData()) ) ;
-           break;
-           case "d":
-           break;
-           default: System.out.println("Select the correct option");
-           break;
-
+               }
            }
-       }
-       catch( Exception e )
-       {
-          System.out.println( e ) ;
-       }
-       finally
-       {
-          if( socket != null )
-             socket.close() ;
+           catch( Exception e )
+           {
+              System.out.println( e ) ;
+           }
+           finally
+           {
+              if( socket != null )
+                 socket.close() ;
+           }
        }
 
    }
 
    public static void read_always(){
        DatagramSocket socket = null ;
+       while(true){
 
-       try
-       {
-           // Convert the arguments first, to ensure that they are valid
-           String s_json;
-           DatagramPacket packet;
-           byte[] receiveData = new byte[1024];
-           InetAddress host =  getHost();
-           int port = getPort();
-           // Construct the socket
-           socket = new DatagramSocket() ;
-           packet = new DatagramPacket( receiveData, receiveData.length, host, port) ;
+           try
+           {
+               //System.out.println("i'm reading...");
+               // Convert the arguments first, to ensure that they are valid
+               String s_json;
+               DatagramPacket packet;
+               byte [] data;
+               InetAddress host =  getHost();
+               int port = getPort();
+               s_json =  "{\"id\":  \"id\", \"user\": \"equis\",\"text\": \"ejemplo\",\"action\": \"f\"}";
+               data = s_json.getBytes() ;
+               // Construct the socket
+               socket = new DatagramSocket() ;
+               packet = new DatagramPacket( data, data.length, host, port) ;
+               // Send it
+               socket.send( packet ) ;
+               // Set a receive timeout, 2000 milliseconds
+               socket.setSoTimeout( 10000 ) ;
+              // Prepare the packet for receive
+              packet.setData( new byte[PACKETSIZE] ) ;
+              // Wait for a response from the server
+              socket.receive( packet ) ;
+              // Print the response
 
-
-           // Set a receive timeout, 2000 milliseconds
-          socket.setSoTimeout( 5000 ) ;
-          // Prepare the packet for receive
-          packet.setData( new byte[PACKETSIZE] ) ;
-          // Wait for a response from the server
-          socket.receive( packet ) ;
-          // Print the response
-          System.out.println( new String(packet.getData()) ) ;
-      }
-      catch( Exception e )
-      {
-         System.out.println( e ) ;
-      }
-      finally
-      {
-         if( socket != null )
-            socket.close() ;
+             /* String answer = new String(packet.getData());
+              if(answer.equals("exit")){
+                  break;
+              }*/
+              System.out.println( new String(packet.getData()) ) ;
+          }
+          catch( Exception e )
+          {
+             System.out.println( e ) ;
+          }
+          finally
+          {
+             if( socket != null )
+                socket.close() ;
+          }
       }
 
    }
