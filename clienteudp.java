@@ -13,6 +13,8 @@ public class Clienteudp extends Thread
    private static DatagramPacket packet;
    private static InetAddress host;
    private static int port;
+   private static boolean stop = true;
+
 
 
     public static InetAddress getHost() {
@@ -46,6 +48,14 @@ public class Clienteudp extends Thread
 
     public static void setUsername(String newusername) {
         username = newusername;
+    }
+
+    public static boolean getStop() {
+        return stop;
+    }
+
+    public static void setStop(boolean newstop) {
+        stop = newstop;
     }
 
 
@@ -125,7 +135,9 @@ public class Clienteudp extends Thread
    public static void client_operations(){
 
        DatagramSocket socket = null ;
-       while(true){
+       boolean try_stop = getStop();
+       System.out.println("stop operations " + stop);
+       while(try_stop){
            try
            {
                String s_json;
@@ -213,6 +225,8 @@ public class Clienteudp extends Thread
                            // Send it
                    socket.send( packet ) ;
                    // Set a receive timeout, 2000 milliseconds
+                   boolean stop_thread = false;
+                   setStop(stop_thread);
                    socket.setSoTimeout( 10000 ) ;
                    // Prepare the packet for receive
                    packet.setData( new byte[PACKETSIZE] ) ;
@@ -220,11 +234,13 @@ public class Clienteudp extends Thread
                    socket.receive( packet ) ;
                    // Print the response
                    System.out.println( new String(packet.getData()) ) ;
+                   System.exit(0);
                break;
                default: System.out.println("Select the correct option");
                break;
 
                }
+               try_stop = getStop();
            }
            catch( Exception e )
            {
@@ -236,13 +252,18 @@ public class Clienteudp extends Thread
                  socket.close() ;
            }
        }
+       //kill thread
+       try{
+           thread1.interrupt();
+       }catch(Exception e){System.out.println("Exception handled "+e);}
 
    }
 
    public static void read_always(){
        DatagramSocket socket = null ;
-       while(true){
-
+       boolean try_stop = getStop();
+       System.out.println("stop read " + stop);
+       while(try_stop){
            try
            {
                // Convert the arguments first, to ensure that they are valid
@@ -271,6 +292,7 @@ public class Clienteudp extends Thread
                   break;
               }*/
               System.out.println( new String(packet.getData()) ) ;
+              try_stop = getStop();
           }
           catch( Exception e )
           {
@@ -282,6 +304,10 @@ public class Clienteudp extends Thread
                 socket.close() ;
           }
       }
+      //kill thread
+      try{
+          thread2.interrupt();
+      }catch(Exception e){System.out.println("Exception handled "+e);}
 
    }
 

@@ -125,7 +125,6 @@ def resend_broadcast(d_json):
     if b_mssg != " ":
         flag = 0
         count_ports = 0
-        print(" *********entered broadcast from port: ", d_json['id'][1])
         # for i in range(10):
 
         # if d_json['id'][1] not in list_broadcast_port:
@@ -179,9 +178,11 @@ def exit(d_json):
 def solve_action(d_json):
     global flag_broadcast
     global flag_private
+    global list_broadcast_ip
     action = d_json['action']
     print(action)
     if action == 'a':
+        list_broadcast_ip = []
         flag_broadcast = 1
         flag_private = 0
         broadcast_message(d_json)
