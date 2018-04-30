@@ -5,4 +5,4 @@
     "user": "user_example",
     "text": "this is an example",
     "action": "a"
-    } , {"action": "e", "text": "", "id": ["192.168.1.68", 61603], "user": "estefy"} , {"action": "e", "text": "", "id": ["192.168.1.75", 33071], "user": "otra"} , {"action": "c", "text": "hola,otra", "id": ["192.168.1.68", 61604], "user": "estefy"} , {"action": "c", "text": "eyyyy,otra", "id": ["192.168.1.68", 61607], "user": "estefy"} , {"action": "c", "text": "ahuevo,estefy", "id": ["192.168.1.75", 58225], "user": "otra"} , {"action": "b", "text": "text", "id": ["192.168.1.68", 62974], "user": "estefy"}]}
+    } , {"action": "e", "text": "", "id": ["192.168.1.68", 64234], "user": "estefy"} , {"action": "e", "text": "", "id": ["192.168.1.75", 38873], "user": "otro"} , {"action": "a", "text": "hola1", "id": ["192.168.1.68", 64235], "user": "estefy"} , {"action": "a", "text": "hola2", "id": ["192.168.1.68", 49791], "user": "estefy"}]}

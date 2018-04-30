@@ -5,8 +5,16 @@ import threading
 import unicodedata
 
 p_mssg = " "
+b_mssg = " "
 tup1 = ()
 max_count = 0
+max_count_b = 0
+times_mssg_broadcasted = 0
+list_broadcast_ip = []
+list_broadcast_port = []
+flag_private = 0
+flag_broadcast = 0
+total_users = 0
 
 
 def processEntry(data, addr):
@@ -62,15 +70,24 @@ def give_users(d_json):  # gives list of users connected to the chat
 
 
 def broadcast_message(d_json):
+    global b_mssg
+    global list_broadcast_ip
+    global total_users
+    count_ip = 0
     print("*BROADCAST MESSAGE")
     data = json.load(open('example.json'))
-    for d in data['messages']:
-        print("send to", d_json['text'], d['id'])
-        s.sendto(d_json['text'], d['user'])
+    print("_________", len(data['messages'][0]))
+    total_users = len(data['messages'][0])
+
+    # for d in data['messages']:
+        # if d['id'][0] not in list_broadcast_ip:
+            # list_broadcast_ip.append(d['id'][0])
+    # print("_________", list_broadcast_ip)
+    b_mssg = d_json['text']
+    # s.sendto(d_json['text'], d['user'])
 
 
 def private_message(d_json):
-    user_exists = 0
     user_ok = 0
     count = 0
     error_mssg = "User doesn't exist"
@@ -84,32 +101,55 @@ def private_message(d_json):
         count += 1
         if recipient_pm == d['user']:
             list1 = [0, 0]
-            list1[0] = d['id'][0]
-            list1[1] = d_json['id'][1]
+            list1[0] = d['id'][0]  # ip
+            list1[1] = d_json['id'][1]  # this doesn't work because it's the port from case c, not from the always reading thread
             modify_ip = list1[0]
             modify_ip = modify_ip.encode("utf-8")
             p_mssg = p_mssg.encode("utf-8")
             list1[0] = modify_ip
             global tup1
             tup1 = tuple(list1)
-            # print("d_json_0", type(d_json['id'][0]))
-            # print("tuple_0", type(list1[0]))
-            # print("d_json_1", type(d_json['id'][1]))
-            # print("tuple_1", type(list1[1]))
-            # print("d_json", type(d_json['id']))
-            # print("tuple", type(tup1))
-
-            # print("Private message sent: ", p_mssg, tuple(d['id']))
-            # print("Private message sent: ", p_mssg, tuple(tup))
-            # print("Private message sent: ", p_mssg, d_json['id'])
             print("Private message sent: ", p_mssg, tup1)
-
-            # s.sendto(p_mssg, tup1)
         else:
             user_ok += 1
-    if user_ok == count:
+    if user_ok == count:  # let client know user doesn't exist
         print("error")
         s.sendto(error_mssg, d_json['id'])
+
+
+def resend_broadcast(d_json):
+    global list_broadcast_port
+    global b_mssg
+    global times_mssg_broadcasted
+    global total_users
+    if b_mssg != " ":
+        flag = 0
+        count_ports = 0
+        print(" *********entered broadcast from port: ", d_json['id'][1])
+        # for i in range(10):
+
+        # if d_json['id'][1] not in list_broadcast_port:
+                # count_ports += 1
+                # x = len(list_broadcast_port)
+                # if count_ports == x:
+            # list_broadcast_port.append(d_json['id'][1])
+            # print("ports:", list_broadcast_port)
+        if d_json['id'][0] not in list_broadcast_ip:
+            list_broadcast_ip.append(d_json['id'][0])
+            flag = 1
+        if flag == 1:
+                # if max_count_b < 2:
+                    li2 = d_json['id']
+                    tup_broadcast = tuple(li2)
+                    message_for_client = b_mssg
+                    print("___mssg", message_for_client, "addr", tup_broadcast)
+                    # global max_count_b
+                    # max_count_b += 1
+                    times_mssg_broadcasted += 1
+                    s.sendto(message_for_client, tup_broadcast)
+        #  con elif se cicla
+        if times_mssg_broadcasted == total_users:
+            b_mssg = " "
 
 
 def resend_message(d_json):
@@ -137,24 +177,40 @@ def exit(d_json):
 
 
 def solve_action(d_json):
+    global flag_broadcast
+    global flag_private
     action = d_json['action']
     print(action)
     if action == 'a':
+        flag_broadcast = 1
+        flag_private = 0
         broadcast_message(d_json)
     elif action == 'b':
+        flag_broadcast = 0
+        flag_private = 0
         give_users(d_json)
     elif action == 'c':
+        flag_private = 1
+        flag_broadcast = 0
         private_message(d_json)
     elif action == 'd':
         exit(d_json)
     elif action == 'e':
         print("new user saved")
-    elif action == 'f':
+        flag_broadcast = 0
+        flag_private = 0
+    elif action == 'f' and flag_private == 1:  # read private message
         if p_mssg == " ":
             print("cambio de count")
             global max_count
             max_count = 0
         resend_message(d_json)
+    elif action == 'f' and flag_broadcast == 1:  # read broadcast message
+        # if b_mssg == " ":
+            # print("cambio de count")
+            # global max_count_b
+            # max_count_b = 0
+        resend_broadcast(d_json)
 
 
 

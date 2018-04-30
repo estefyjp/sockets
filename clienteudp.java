@@ -251,7 +251,6 @@ public class Clienteudp extends Thread
                byte [] data;
                InetAddress host =  getHost();
                int port = getPort();
-               System.out.println("i'm reading...from:" + host + "port:" + port);
                s_json =  "{\"id\":  \"id\", \"user\": \"equis\",\"text\": \"ejemplo\",\"action\": \"f\"}";
                data = s_json.getBytes() ;
                // Construct the socket
