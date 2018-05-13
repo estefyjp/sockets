@@ -3,6 +3,8 @@ import sys
 import json
 import threading
 import unicodedata
+import os
+
 
 p_mssg = " "
 b_mssg = " "
@@ -16,27 +18,43 @@ flag_private = 0
 flag_broadcast = 0
 total_users = 0
 
+#       *********************           chat                    ***************
+
 
 def processEntry(data, addr):
     user_exists = 0
     user_ok = 0
-    d = data.replace('\\', ' ')  # format string
-    d_json = json.loads(d)
-    d_json['id'] = addr      # change id to ip address
-    # verify that usernames are unique
-    data = json.load(open('example.json'))
-    if d_json['action'] == 'e':  # if a new user is registering
-        print("new user registering....")
-        for d in data['messages']:
-            if (d['user'] == d_json['user']) and (d_json['action'] == 'e'):
-                user_exists = 1
-            elif (d['user'] != d_json['user']) and (d_json['action'] == 'e'):
-                user_ok = 1
-        if user_exists == 1:
-            s.sendto("Username already exist", d_json['id'])
-        elif user_ok == 1:
-            s.sendto("Username valid", d_json['id'])
-            with open('example.json', 'a+') as f:  # adds user to json
+    if data.startswith('hello'):
+        listen_servers()
+    else:
+        d = data.replace('\\', ' ')  # format string
+        d_json = json.loads(d)
+        d_json['id'] = addr      # change id to ip address
+        # verify that usernames are unique
+        data = json.load(open('example.json'))
+        if d_json['action'] == 'e':  # if a new user is registering
+            print("new user registering....")
+            print("address", addr, type(addr))
+            for d in data['messages']:
+                if (d['user'] == d_json['user']) and (d_json['action'] == 'e'):
+                    user_exists = 1
+                elif (d['user'] != d_json['user']) and (d_json['action'] == 'e'):
+                    user_ok = 1
+            if user_exists == 1:
+                s.sendto("Username already exist", d_json['id'])
+            elif user_ok == 1:
+                s.sendto("Username valid", d_json['id'])
+                with open('example.json', 'a+') as f:  # adds user to json
+                    f.seek(0, 2)
+                    f.truncate()
+                    f.seek(-2, 2)
+                    f.truncate()
+                    f.write(' , ')
+                    json.dump(d_json, f)
+                    f.write(']}')
+        #  TODO update each users must recent action
+        elif d_json['action'] != 'f':
+            with open('example.json', 'a+') as f:
                 f.seek(0, 2)
                 f.truncate()
                 f.seek(-2, 2)
@@ -44,19 +62,9 @@ def processEntry(data, addr):
                 f.write(' , ')
                 json.dump(d_json, f)
                 f.write(']}')
-    #  TODO update each users must recent action
-    elif d_json['action'] != 'f':
-        with open('example.json', 'a+') as f:
-            f.seek(0, 2)
-            f.truncate()
-            f.seek(-2, 2)
-            f.truncate()
-            f.write(' , ')
-            json.dump(d_json, f)
-            f.write(']}')
-        solve_action(d_json)
-    elif d_json['action'] == 'f':
-        solve_action(d_json)
+            solve_action(d_json)
+        elif d_json['action'] == 'f':
+            solve_action(d_json)
 
 
 def give_users(d_json):  # gives list of users connected to the chat
@@ -214,6 +222,26 @@ def solve_action(d_json):
         resend_broadcast(d_json)
 
 
+#       *********************          ENDOF chat                    **********
+
+
+def other_servers_send():
+    server_addr = ('192.168.1.68', 8888)
+    server_hello_mssg = "hello server 1 active"
+    for i in range(0, 3):
+        s.sendto(server_hello_mssg, server_addr)
+
+
+def listen_servers():
+    for i in range(0, 3):
+        d_server = s.recvfrom(1024)
+        data_s = d_server[0]
+        addr_s = d_server[1]
+        if not data_s:
+            print("no data")
+            break
+        print(data_s)
+
 
 # Datagram (udp) socket
 def server_thread():
@@ -261,6 +289,12 @@ except socket.error, msg:
 
 print 'Socket bind complete'
 
+
+with open('example.json', 'a+') as f:  # refresh json every time server starts
+    f.seek(121, 0)
+    f.truncate()
+    f.write(']}')
+
 threads = list()
 for i in range(3):
     t = threading.Thread(target=server_thread)
@@ -268,3 +302,8 @@ for i in range(3):
     threads.append(t)
     t.start()
 
+t_servers_send = threading.Thread(target=other_servers_send)
+t_servers_send.start()
+
+t_servers_read = threading.Thread(target=listen_servers)
+t_servers_read.start()
