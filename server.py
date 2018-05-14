@@ -4,6 +4,7 @@ import json
 import threading
 import unicodedata
 import os
+import time
 
 
 p_mssg = " "
@@ -17,6 +18,10 @@ list_broadcast_port = []
 flag_private = 0
 flag_broadcast = 0
 total_users = 0
+# new
+list_ip_servers = []
+list_ip_servers.append("10")
+
 
 #       *********************           chat                    ***************
 
@@ -25,7 +30,7 @@ def processEntry(data, addr):
     user_exists = 0
     user_ok = 0
     if data.startswith('hello'):
-        listen_servers()
+        listen_servers(data, addr)
     else:
         d = data.replace('\\', ' ')  # format string
         d_json = json.loads(d)
@@ -223,24 +228,25 @@ def solve_action(d_json):
 
 
 #       *********************          ENDOF chat                    **********
+def register_server(data, addr):
+    global list_ip_servers
+    if addr[0] not in list_ip_servers:
+        list_ip_servers.append(addr[0])
+        print(list_ip_servers)
 
 
 def other_servers_send():
     server_addr = ('192.168.1.68', 8888)
     server_hello_mssg = "hello server 1 active"
-    for i in range(0, 3):
+    while 1:
+    # for i in range(0, 3):
         s.sendto(server_hello_mssg, server_addr)
 
 
-def listen_servers():
-    for i in range(0, 3):
-        d_server = s.recvfrom(1024)
-        data_s = d_server[0]
-        addr_s = d_server[1]
-        if not data_s:
-            print("no data")
-            break
-        print(data_s)
+def listen_servers(data, addr):
+    if not data:
+        print("no data")
+    register_server(data, addr)
 
 
 # Datagram (udp) socket
@@ -255,7 +261,7 @@ def server_thread():
         d = s.recvfrom(1024)
         data = d[0]
         addr = d[1]
-        print(d[0])
+        # print(d[0])
         if not data:
             print("no data")
             break
@@ -302,8 +308,8 @@ for i in range(3):
     threads.append(t)
     t.start()
 
-t_servers_send = threading.Thread(target=other_servers_send)
-t_servers_send.start()
+# t_servers_send = threading.Thread(target=listen_servers())
+# t_servers_send.start()
 
-t_servers_read = threading.Thread(target=listen_servers)
+t_servers_read = threading.Thread(target=other_servers_send)
 t_servers_read.start()
